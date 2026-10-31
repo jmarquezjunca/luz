@@ -53,6 +53,8 @@ a.bt{flex:1;min-height:46px;display:flex;align-items:center;justify-content:cent
 h1{display:none}
 
 .t{font-weight:600}.tg{color:var(--good)}.tm{color:var(--mid)}.tb{color:var(--bad)}
+.cg{background:#1f9d55;color:#fff}.cm{background:#e9a820;color:#1d1400}.cr{background:#d63a3f;color:#fff}
+.c.k small,.c.k i{color:inherit;opacity:.85}
 button#hoy{background:#2f5fd0;color:#fff;border:0}
 button#man{background:#e9a820;color:#1d1400;border:0}
 button#hoy:active,button#man:active{opacity:.8}
@@ -120,8 +122,9 @@ function render(){
  var avg=P.reduce(function(a,b){return a+b},0)/24;
  $('sub').textContent='PVPC del '+ddmmyyyy(SEL)+' · con bono del '+S.cfg.d.toLocaleString('es-ES')+' % e impuestos';
  var first=isToday?{t:'Ahora ('+hl(m.h)+')',p:P[m.h]}:{t:'Media del día',p:avg};
- function card(t,p){return '<div class="c"><small>'+t+'</small><b>'+fmt(fin(p))+'</b><i>'+fmt(p)+' sin bono</i></div>'}
- $('cards').innerHTML=card(first.t,first.p)+card('Más barata '+hl(mn),P[mn])+card('Más cara '+hl(mx),P[mx]);
+ function kc(p){return p<=lo?'cg':(p>=hi?'cr':'cm')}
+ function card(t,p,k){return '<div class="c k '+k+'"><small>'+t+'</small><b>'+fmt(fin(p))+'</b><i>'+fmt(p)+' sin bono</i></div>'}
+ $('cards').innerHTML=card(first.t,first.p,kc(first.p))+card('Más barata '+hl(mn),P[mn],'cg')+card('Más cara '+hl(mx),P[mx],'cr');
  var h='<div class="r h"><span>Hora</span><span>Precio luz<br>€/kWh</span><span>Con bono + impuestos<br>€/kWh</span></div>';
  for(var i=0;i<24;i++){var p=P[i],c=p<=lo?'tg':(p>=hi?'tb':'tm');
   h+='<div class="r'+(isToday&&i===m.h?' now':'')+'"><span class="hr">'+hl(i)+'</span><span class="t '+c+'">'+fmt(p)+'</span><span class="t fin '+c+'">'+fmt(fin(p))+'</span></div>'}

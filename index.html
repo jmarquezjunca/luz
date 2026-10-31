@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-title" content="Luz">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" type="image/png" href="icon.png">
-<title>Luz por horas · Bono social</title>
+<title>Precio diario de la luz</title>
 <style>
 :root{--bg:#f2f2f7;--card:#fff;--text:#111;--muted:#6b6b73;--line:#e3e3e8;--accent:#0a84ff;--good:#22a559;--mid:#c28500;--bad:#e5484d;--hl:#e8f1ff;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
@@ -50,11 +50,15 @@ button.s{background:var(--bg);color:var(--text);border:1px solid var(--line)}
 a{color:var(--accent)}
 a.bt{flex:1;min-height:46px;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);text-decoration:none;font-weight:600}
 .top{margin:0}
-h1{display:none}
+h1{display:block;font-size:21px;font-weight:700;margin:12px 2px 10px;letter-spacing:-.3px}
+.cards{margin-top:10px}
 
 .t{font-weight:600}.tg{color:var(--good)}.tm{color:var(--mid)}.tb{color:var(--bad)}
 .cg{background:#1f9d55;color:#fff}.cm{background:#e9a820;color:#1d1400}.cr{background:#d63a3f;color:#fff}
+.c{padding:3px 5px;border:3px solid transparent}
+.c.sel{border-color:var(--text)}
 .c.k small,.c.k i{color:inherit;opacity:.85}
+.c small{font-weight:700;font-size:12px;line-height:1.25;opacity:1!important}
 button#hoy{background:#2f5fd0;color:#fff;border:0}
 button#man{background:#e9a820;color:#1d1400;border:0}
 button#hoy:active,button#man:active{opacity:.8}
@@ -71,9 +75,8 @@ button#hoy:active,button#man:active{opacity:.8}
 </style>
 </head>
 <body>
-<h1>Luz por horas</h1>
+<h1>Precio diario de la luz</h1>
 <div class="btns top"><input type="date" id="dt" aria-label="Día" style="flex:1;min-width:0;min-height:46px"><button class="s" id="hoy" style="flex:none;width:64px">Hoy</button><button class="s" id="man" style="flex:none;width:84px">Mañana</button></div>
-<p class="sub" id="sub" style="margin-top:8px"></p>
 <div class="msg" id="st"></div>
 <div class="cards" id="cards"></div>
 <div class="tbl" id="tbl"></div>
@@ -113,18 +116,16 @@ function render(){
  var P=S.days[SEL],m=madrid(),isToday=m.date===SEL,ae=document.activeElement;
  [['dt',SEL],['cd',S.cfg.d],['ci',S.cfg.iee],['cv',S.cfg.iva]].forEach(function(x){if(ae!==$(x[0]))$(x[0]).value=x[1]});
  if(!P){
-  $('sub').textContent='Sin precios guardados para el '+ddmmyyyy(SEL);
   $('cards').innerHTML='';$('note').textContent='';
   $('tbl').innerHTML='<div class="r" style="display:block;padding:16px 14px;min-height:0">No tengo los precios del '+ddmmyyyy(SEL)+'. Pulsa Actualizar para consultarlos.</div>';
   return}
  var sorted=P.slice().sort(function(a,b){return a-b});
  var lo=sorted[7],hi=sorted[16],mn=P.indexOf(sorted[0]),mx=P.indexOf(sorted[23]);
  var avg=P.reduce(function(a,b){return a+b},0)/24;
- $('sub').textContent='PVPC del '+ddmmyyyy(SEL)+' · con bono del '+S.cfg.d.toLocaleString('es-ES')+' % e impuestos';
- var first=isToday?{t:'Ahora ('+hl(m.h)+')',p:P[m.h]}:{t:'Media del día',p:avg};
+ var first=isToday?{t:'Ahora<br>'+hl(m.h),p:P[m.h]}:{t:'Media<br>del día',p:avg};
  function kc(p){return p<=lo?'cg':(p>=hi?'cr':'cm')}
- function card(t,p,k){return '<div class="c k '+k+'"><small>'+t+'</small><b>'+fmt(fin(p))+'</b><i>'+fmt(p)+' sin bono</i></div>'}
- $('cards').innerHTML=card(first.t,first.p,kc(first.p))+card('Más barata '+hl(mn),P[mn],'cg')+card('Más cara '+hl(mx),P[mx],'cr');
+ function card(t,p,k,sel){return '<div class="c k '+k+(sel?' sel':'')+'"><small>'+t+'</small><b>'+fmt(fin(p))+'</b><i>'+fmt(p)+' sin bono</i></div>'}
+ $('cards').innerHTML=card(first.t,first.p,kc(first.p),isToday)+card('Más barata<br>'+hl(mn),P[mn],'cg',isToday&&m.h===mn)+card('Más cara<br>'+hl(mx),P[mx],'cr',isToday&&m.h===mx);
  var h='<div class="r h"><span>Hora</span><span>Precio luz<br>€/kWh</span><span>Con bono + impuestos<br>€/kWh</span></div>';
  for(var i=0;i<24;i++){var p=P[i],c=p<=lo?'tg':(p>=hi?'tb':'tm');
   h+='<div class="r'+(isToday&&i===m.h?' now':'')+'"><span class="hr">'+hl(i)+'</span><span class="t '+c+'">'+fmt(p)+'</span><span class="t fin '+c+'">'+fmt(fin(p))+'</span></div>'}

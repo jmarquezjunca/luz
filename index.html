@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Luz">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<title>Luz por horas · Bono social</title>
+<style>
+:root{--bg:#f2f2f7;--card:#fff;--text:#111;--muted:#6b6b73;--line:#e3e3e8;--accent:#0a84ff;--good:#22a559;--mid:#e0a100;--bad:#e5484d;--hl:#e8f1ff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--card:#1c1c1e;--text:#f2f2f7;--muted:#9a9aa3;--line:#2c2c2e;--accent:#4da3ff;--good:#34c470;--mid:#f0b429;--bad:#ff6369;--hl:#14283f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#000;--card:#1c1c1e;--text:#f2f2f7;--muted:#9a9aa3;--line:#2c2c2e;--accent:#4da3ff;--good:#34c470;--mid:#f0b429;--bad:#ff6369;--hl:#14283f;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;padding:0 max(14px,env(safe-area-inset-right,0px)) 24px max(14px,env(safe-area-inset-left,0px));max-width:560px;margin-inline:auto}
+h1{font-size:26px;margin:18px 0 2px;letter-spacing:-.4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 12px}
+.warn{background:var(--card);border:1px solid var(--mid);color:var(--text);border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.c{background:var(--card);border-radius:14px;padding:10px 10px 9px;min-width:0}
+.c small{display:block;color:var(--muted);font-size:12px}
+.c b{display:block;font-size:19px;letter-spacing:-.3px;margin-top:2px}
+.c i{display:block;font-style:normal;color:var(--muted);font-size:11px;margin-top:1px}
+.tbl{background:var(--card);border-radius:14px;overflow:hidden}
+.r{display:grid;grid-template-columns:76px 1fr 1fr;align-items:center;padding:0 12px;min-height:44px;border-top:1px solid var(--line)}
+.r:first-child{border-top:0}
+.r.h{min-height:52px;font-size:12px;color:var(--muted);font-weight:600;line-height:1.2}
+.r.h span:nth-child(n+2),.r span:nth-child(n+2){text-align:right;font-variant-numeric:tabular-nums}
+.r.now{background:var(--hl)}
+.r.now .hr::after{content:" ahora";color:var(--accent);font-size:11px;font-weight:600}
+.hr{display:flex;align-items:center;gap:7px;font-weight:600;font-size:14px;white-space:nowrap}
+.d{width:9px;height:9px;border-radius:50%;flex:none}
+.good{background:var(--good)}.mid{background:var(--mid)}.bad{background:var(--bad)}
+.fin{font-weight:700}
+.note{color:var(--muted);font-size:12.5px;margin:10px 4px}
+details{background:var(--card);border-radius:14px;margin-top:12px;padding:0 14px}
+summary{min-height:48px;display:flex;align-items:center;font-weight:600;cursor:pointer}
+.in{padding:0 0 14px}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+input,textarea{width:100%;font:16px -apple-system,Arial,sans-serif;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+textarea{min-height:110px;resize:vertical}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.btns{display:flex;gap:8px;margin-top:12px}
+button{flex:1;min-height:46px;border-radius:12px;border:0;font:600 16px -apple-system,Arial,sans-serif;background:var(--accent);color:#fff}
+button.s{background:var(--bg);color:var(--text);border:1px solid var(--line)}
+.msg{font-size:13px;margin-top:8px;min-height:18px}
+a{color:var(--accent)}
+a.bt{flex:1;min-height:46px;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);text-decoration:none;font-weight:600}
+.top{margin:0}
+h1{display:none}
+button#hoy{background:#2f5fd0;color:#fff;border:0}
+button#man{background:#e9a820;color:#1d1400;border:0}
+button#hoy:active,button#man:active{opacity:.8}
+.btns.top input{min-height:38px;padding:6px 10px}.btns.top button{min-height:38px}
+.sub{font-size:12px;margin:6px 2px 6px!important}
+#st{min-height:0;font-size:12px;margin:0 2px 6px}
+#st:empty{margin:0}
+.cards{gap:6px;margin-bottom:8px}
+.c{padding:6px 8px;border-radius:10px}.c small{font-size:11px}.c b{font-size:16px;margin-top:0}.c i{font-size:10px}
+.tbl{border-radius:10px}
+.r{min-height:24px;padding:0 10px;font-size:13px;grid-template-columns:72px 1fr 1fr}
+.r.h{min-height:32px;font-size:11px}
+.hr{font-size:12.5px;gap:6px}.d{width:8px;height:8px}
+</style>
+</head>
+<body>
+<h1>Luz por horas</h1>
+<div class="btns top"><input type="date" id="dt" aria-label="Día" style="flex:1;min-width:0;min-height:46px"><button class="s" id="hoy" style="flex:none;width:64px">Hoy</button><button class="s" id="man" style="flex:none;width:84px">Mañana</button></div>
+<p class="sub" id="sub" style="margin-top:8px"></p>
+<div class="msg" id="st"></div>
+<div class="cards" id="cards"></div>
+<div class="tbl" id="tbl"></div>
+<p class="note" id="note"></p>
+
+<details>
+<summary>Ajustes de descuento e impuestos</summary>
+<div class="in">
+<div class="g3">
+<div><label for="cd">Bono %</label><input id="cd" type="number" inputmode="decimal" step="any"></div>
+<div><label for="ci">Imp. eléctrico %</label><input id="ci" type="number" inputmode="decimal" step="any"></div>
+<div><label for="cv">IVA %</label><input id="cv" type="number" inputmode="decimal" step="any"></div>
+</div>
+</div>
+</details>
+
+<p class="note">Fuente: API de datos de Red Eléctrica de España (REData). Si la consulta falla, mira los precios en <a href="https://www.esios.ree.es/es/pvpc" target="_blank" rel="noopener">ESIOS</a>.</p>
+
+<script>
+var KEY='luz-bono-v2';
+var DEF={days:{},cfg:{d:42.5,iee:5.11269632,iva:21}};
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function load(){var o=null,s=clone(DEF);try{var r=localStorage.getItem(KEY);if(r)o=JSON.parse(r)}catch(e){}
+ if(o){if(o.days&&typeof o.days==='object'){for(var k in o.days){if(Array.isArray(o.days[k])&&o.days[k].length===24)s.days[k]=o.days[k].map(Number)}}
+  if(o.cfg){for(var c in s.cfg){if(typeof o.cfg[c]==='number')s.cfg[c]=o.cfg[c]}}}
+ return s}
+function save(){try{var ks=Object.keys(S.days).sort();while(ks.length>60){delete S.days[ks.shift()]}localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function $(id){return document.getElementById(id)}
+function fmt(n){return n.toLocaleString('es-ES',{minimumFractionDigits:4,maximumFractionDigits:4})}
+function fin(p){return p*(1-S.cfg.d/100)*(1+S.cfg.iee/100)*(1+S.cfg.iva/100)}
+function hl(h){var a=('0'+h).slice(-2),b=('0'+((h+1)%24)).slice(-2);return a+'-'+(h===23?'24':b)+'h'}
+function madrid(){try{var f=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Madrid',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hour12:false}).formatToParts(new Date());var g=function(t){return f.filter(function(x){return x.type===t})[0].value};return{date:g('year')+'-'+g('month')+'-'+g('day'),h:(+g('hour'))%24}}catch(e){var d=new Date();return{date:d.toISOString().slice(0,10),h:d.getHours()}}}
+function ddmmyyyy(s){var p=s.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:s}
+var S=load(),SEL=madrid().date;
+function setMsg(t,ok){var e=$('st');e.textContent=t;e.style.color=ok?'var(--good)':'var(--bad)'}
+function render(){
+ var P=S.days[SEL],m=madrid(),isToday=m.date===SEL,ae=document.activeElement;
+ [['dt',SEL],['cd',S.cfg.d],['ci',S.cfg.iee],['cv',S.cfg.iva]].forEach(function(x){if(ae!==$(x[0]))$(x[0]).value=x[1]});
+ if(!P){
+  $('sub').textContent='Sin precios guardados para el '+ddmmyyyy(SEL);
+  $('cards').innerHTML='';$('note').textContent='';
+  $('tbl').innerHTML='<div class="r" style="display:block;padding:16px 14px;min-height:0">No tengo los precios del '+ddmmyyyy(SEL)+'. Pulsa Actualizar para consultarlos.</div>';
+  return}
+ var sorted=P.slice().sort(function(a,b){return a-b});
+ var lo=sorted[7],hi=sorted[16],mn=P.indexOf(sorted[0]),mx=P.indexOf(sorted[23]);
+ var avg=P.reduce(function(a,b){return a+b},0)/24;
+ $('sub').textContent='PVPC del '+ddmmyyyy(SEL)+' · con bono del '+S.cfg.d.toLocaleString('es-ES')+' % e impuestos';
+ var first=isToday?{t:'Ahora ('+hl(m.h)+')',p:P[m.h]}:{t:'Media del día',p:avg};
+ function card(t,p){return '<div class="c"><small>'+t+'</small><b>'+fmt(fin(p))+'</b><i>'+fmt(p)+' sin bono</i></div>'}
+ $('cards').innerHTML=card(first.t,first.p)+card('Más barata '+hl(mn),P[mn])+card('Más cara '+hl(mx),P[mx]);
+ var h='<div class="r h"><span>Hora</span><span>Precio luz<br>€/kWh</span><span>Con bono + impuestos<br>€/kWh</span></div>';
+ for(var i=0;i<24;i++){var p=P[i],c=p<=lo?'good':(p>=hi?'bad':'mid');
+  h+='<div class="r'+(isToday&&i===m.h?' now':'')+'"><span class="hr"><i class="d '+c+'"></i>'+hl(i)+'</span><span>'+fmt(p)+'</span><span class="fin">'+fmt(fin(p))+'</span></div>'}
+ $('tbl').innerHTML=h;
+ $('note').textContent='Cálculo: precio × (1 − bono) × (1 + imp. eléctrico) × (1 + IVA). Estimación solo del término de energía: el bono aplica hasta un límite anual de kWh y no incluye potencia ni alquiler de contador. Verde: tercio más barato del día; rojo: más caro.';
+}
+function fetchDay(date){
+ var url='https://apidatos.ree.es/es/datos/mercados/precios-mercados-tiempo-real?start_date='+date+'T00:00&end_date='+date+'T23:59&time_trunc=hour';
+ return fetch(url,{headers:{Accept:'application/json'}}).then(function(r){if(!r.ok)throw new Error('error '+r.status);return r.json()}).then(function(j){
+  var inc=(j&&j.included)||[],it=null,i;
+  for(i=0;i<inc.length;i++){var a=inc[i]||{},t=((a.type||'')+' '+((a.attributes||{}).title||'')).toUpperCase();if(t.indexOf('PVPC')>=0){it=a;break}}
+  if(!it)throw new Error('la respuesta no incluye el PVPC');
+  var vals=(it.attributes&&it.attributes.values)||[],sum=[],cnt=[];
+  for(i=0;i<24;i++){sum[i]=0;cnt[i]=0}
+  vals.forEach(function(x){var h=parseInt(String(x.datetime).substr(11,2),10);if(h>=0&&h<24&&typeof x.value==='number'){sum[h]+=x.value;cnt[h]++}});
+  var out=[];
+  for(i=0;i<24;i++){if(!cnt[i])throw new Error('aún no están publicados todos los precios de ese día');out.push(sum[i]/cnt[i]/1000)}
+  return out})}
+var reqId=0;
+function update(){
+ var id=++reqId,d=SEL;setMsg('Consultando Red Eléctrica…',true);
+ fetchDay(d).then(function(v){S.days[d]=v;save();if(id!==reqId)return;setMsg('',true);render()})
+ .catch(function(e){if(id!==reqId)return;var t=(e&&e.name==='TypeError')?'sin conexión o el servidor no permite la consulta':(e&&e.message)||'error desconocido';setMsg('No he podido actualizar: '+t+'.',false)})}
+$('dt').onchange=function(){if(this.value){SEL=this.value;render();update()}};
+$('hoy').onclick=function(){SEL=madrid().date;render();update()};
+$('man').onclick=function(){var d=new Date(madrid().date+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+1);SEL=d.toISOString().slice(0,10);render();update()};
+var lastToday=madrid().date;
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'){var t=madrid().date;if(t!==lastToday){lastToday=t;SEL=t}render();update()}});
+function num(id,k){$(id).oninput=function(){var v=parseFloat(this.value);if(v>=0&&v<100){S.cfg[k]=v;save();render()}}}
+num('cd','d');num('ci','iee');num('cv','iva');
+render();update();
+</script>
+</body>
+</html>

@@ -149,10 +149,11 @@ function fetchDay(date){
   return out})}
 var reqId=0;
 function update(){
- var id=++reqId,d=SEL;setMsg('Consultando Red Eléctrica…',true);
+ var id=++reqId,d=SEL;if(S.days[d]){setMsg('',true);return}setMsg('Consultando Red Eléctrica…',true);
  fetchDay(d).then(function(v){S.days[d]=v;save();if(id!==reqId)return;setMsg('',true);render()})
  .catch(function(e){if(id!==reqId)return;var t=(e&&e.name==='TypeError')?'sin conexión o el servidor no permite la consulta':(e&&e.message)||'error desconocido';setMsg('No he podido actualizar: '+t+'.',false)})}
-$('dt').onchange=function(){if(this.value){SEL=this.value;render();update()}};
+function pick(){var v=this.value,el=this;if(v&&v!==SEL){SEL=v;render();update()}if(v){el.blur();setTimeout(function(){el.blur()},50)}}
+$('dt').addEventListener('change',pick);$('dt').addEventListener('input',pick);
 $('hoy').onclick=function(){SEL=madrid().date;render();update()};
 $('man').onclick=function(){var d=new Date(madrid().date+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+1);SEL=d.toISOString().slice(0,10);render();update()};
 var lastToday=madrid().date;

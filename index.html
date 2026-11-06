@@ -1,166 +1,163 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
+<!doctype html>
+<html lang="es"><head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Luz">
-<link rel="apple-touch-icon" href="icon.png">
-<link rel="icon" type="image/png" href="icon.png">
-<title>Precio diario de la luz</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Horarios Sagalés · Sant Fost ⇄ Mollet</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F6F2EB">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sagalés"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
-:root{--bg:#f2f2f7;--card:#fff;--text:#111;--muted:#6b6b73;--line:#e3e3e8;--accent:#0a84ff;--good:#22a559;--mid:#c28500;--bad:#e5484d;--hl:#e8f1ff;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--card:#1c1c1e;--text:#f2f2f7;--muted:#9a9aa3;--line:#2c2c2e;--accent:#4da3ff;--good:#34c470;--mid:#f0b429;--bad:#ff6369;--hl:#14283f;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#000;--card:#1c1c1e;--text:#f2f2f7;--muted:#9a9aa3;--line:#2c2c2e;--accent:#4da3ff;--good:#34c470;--mid:#f0b429;--bad:#ff6369;--hl:#14283f;color-scheme:dark}
-html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+:root{--n:#0F1F3D;--g:#6B6F78;--bg:#F6F2EB;--lime:#C8F060;--zb:#F8F5EF;--fld:#F1EDE6;--sg:#EAE5DC;--bd:#ECE7DE}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 "DM Sans",-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;padding:0 max(14px,env(safe-area-inset-right,0px)) 24px max(14px,env(safe-area-inset-left,0px));max-width:560px;margin-inline:auto}
-h1{font-size:26px;margin:18px 0 2px;letter-spacing:-.4px}
-.sub{color:var(--muted);font-size:14px;margin:0 0 12px}
-.warn{background:var(--card);border:1px solid var(--mid);color:var(--text);border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:12px}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.c{background:var(--card);border-radius:14px;padding:10px 10px 9px;min-width:0}
-.c small{display:block;color:var(--muted);font-size:12px}
-.c b{display:block;font-size:19px;letter-spacing:-.3px;margin-top:2px}
-.c i{display:block;font-style:normal;color:var(--muted);font-size:11px;margin-top:1px}
-.tbl{background:var(--card);border-radius:14px;overflow:hidden}
-.r{display:grid;grid-template-columns:76px 1fr 1fr;align-items:center;padding:0 12px;min-height:44px;border-top:1px solid var(--line)}
-.r:first-child{border-top:0}
-.r.h{min-height:52px;font-size:12px;color:var(--muted);font-weight:600;line-height:1.2}
-.r.h span:nth-child(n+2),.r span:nth-child(n+2){text-align:right;font-variant-numeric:tabular-nums}
-.r.now{background:var(--hl)}
-.r.now .hr::after{content:" ahora";color:var(--accent);font-size:11px;font-weight:600}
-.hr{display:flex;align-items:center;gap:7px;font-weight:600;font-size:14px;white-space:nowrap}
-.d{width:9px;height:9px;border-radius:50%;flex:none}
-.good{background:var(--good)}.mid{background:var(--mid)}.bad{background:var(--bad)}
-.fin{font-weight:700}
-.note{color:var(--muted);font-size:12.5px;margin:10px 4px}
-details{background:var(--card);border-radius:14px;margin-top:12px;padding:0 14px}
-summary{min-height:48px;display:flex;align-items:center;font-weight:600;cursor:pointer}
-.in{padding:0 0 14px}
-label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
-input,textarea{width:100%;font:16px "DM Sans",-apple-system,Arial,sans-serif;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
-textarea{min-height:110px;resize:vertical}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.btns{display:flex;gap:8px;margin-top:12px}
-button{flex:1;min-height:46px;border-radius:12px;border:0;font:600 16px "DM Sans",-apple-system,Arial,sans-serif;background:var(--accent);color:#fff}
-button.s{background:var(--bg);color:var(--text);border:1px solid var(--line)}
-.msg{font-size:13px;margin-top:8px;min-height:18px}
-a{color:var(--accent)}
-a.bt{flex:1;min-height:46px;display:flex;align-items:center;justify-content:center;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);text-decoration:none;font-weight:600}
-.top{margin:0}
-h1{display:block;font-family:"Playfair Display",Georgia,"Times New Roman",serif;font-size:24px;font-weight:700;margin:12px 2px 10px;letter-spacing:0}
-.cards{margin-top:10px}
-
-.t{font-weight:600}.tg{color:var(--good)}.tm{color:var(--mid)}.tb{color:var(--bad)}
-.cg{background:#1f9d55;color:#fff}.cm{background:#e9a820;color:#1d1400}.cr{background:#d63a3f;color:#fff}
-.c{padding:3px 5px;border:3px solid transparent}
-.c.sel{border-color:var(--text)}
-.c.k small,.c.k i{color:inherit;opacity:.85}
-.c small{font-weight:700;font-size:12px;line-height:1.25;opacity:1!important}
-button#hoy{background:#2f5fd0;color:#fff;border:0}
-button#man{background:#e9a820;color:#1d1400;border:0}
-button#hoy:active,button#man:active{opacity:.8}
-.btns.top input{min-height:38px;padding:6px 10px}.btns.top button{min-height:38px}
-.sub{font-size:12px;margin:6px 2px 6px!important}
-#st{min-height:0;font-size:12px;margin:0 2px 6px}
-#st:empty{margin:0}
-.cards{gap:6px;margin-bottom:8px}
-.c{padding:6px 8px;border-radius:10px}.c small{font-size:11px}.c b{font-size:16px;margin-top:0}.c i{font-size:10px}
-.tbl{border-radius:10px}
-.r{min-height:24px;padding:0 10px;font-size:13px;grid-template-columns:72px 1fr 1fr}
-.r.h{min-height:32px;font-size:11px}
-.hr{font-size:12.5px;gap:6px}.d{width:8px;height:8px}
-</style>
-</head>
-<body>
-<h1>Precio diario de la luz</h1>
-<div class="btns top"><input type="date" id="dt" aria-label="Día" style="flex:1;min-width:0;min-height:46px"><button class="s" id="hoy" style="flex:none;width:64px">Hoy</button><button class="s" id="man" style="flex:none;width:84px">Mañana</button></div>
-<div class="msg" id="st"></div>
-<div class="cards" id="cards"></div>
-<div class="tbl" id="tbl"></div>
-<p class="note" id="note"></p>
-
-<details>
-<summary>Ajustes de descuento e impuestos</summary>
-<div class="in">
-<div class="g3">
-<div><label for="cd">Bono %</label><input id="cd" type="number" inputmode="decimal" step="any"></div>
-<div><label for="ci">Imp. eléctrico %</label><input id="ci" type="number" inputmode="decimal" step="any"></div>
-<div><label for="cv">IVA %</label><input id="cv" type="number" inputmode="decimal" step="any"></div>
-</div>
-</div>
-</details>
-
-<p class="note">Fuente: API de datos de Red Eléctrica de España (REData). Si la consulta falla, mira los precios en <a href="https://www.esios.ree.es/es/pvpc" target="_blank" rel="noopener">ESIOS</a>.</p>
-
+body{position:fixed;inset:0;margin:0;background:var(--bg);color:var(--n);font:13px "Plus Jakarta Sans",system-ui,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+button,input{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none;padding:0}
+header{flex:none;padding:calc(10px + env(safe-area-inset-top)) 12px 0}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+h1{margin:0;font-size:21px;font-weight:800;letter-spacing:-.4px}
+.clock{text-align:right;line-height:1.15}.clock b{display:block;font-size:14px;font-weight:800}.clock span{font-size:10px;color:var(--g)}
+.card{background:#fff;border-radius:18px;box-shadow:0 1px 2px rgba(15,31,61,.05),0 6px 18px rgba(15,31,61,.05)}
+.ctl{display:flex;gap:6px;padding:5px;align-items:center;margin-bottom:5px}
+.fld{flex:1;height:32px;border-radius:11px;background:var(--fld);display:flex;align-items:center;padding:0 10px;min-width:0}
+.fld input{border:0;background:none;width:100%;font-weight:600;font-size:13px;color-scheme:light;min-width:0}
+.btn{height:32px;border-radius:11px;padding:0 13px;font-weight:800;font-size:13px;background:var(--fld);flex:none}
+.btn.on{background:var(--lime)}.btn.dk{background:var(--n);color:#fff}
+.loc{flex:1;display:flex;align-items:center;gap:8px;font-weight:600;font-size:12.5px;padding-left:6px;min-width:0}
+.seg{display:flex;background:var(--sg);border-radius:14px;padding:3px;margin-bottom:5px;gap:2px}
+.seg>*{flex:1;height:27px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--g);white-space:nowrap;padding:0 4px;min-width:0}
+.seg .on{background:#fff;color:var(--n);box-shadow:0 1px 3px rgba(15,31,61,.12)}
+.cnt{display:flex;justify-content:space-between;align-items:baseline;margin:2px 4px 6px}.cnt b{font-size:15px;font-weight:800}.cnt span{font-size:11px;color:var(--g)}
+main{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;padding:0 12px}main>*{flex:none}
+.bar{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--g);margin:0 4px 5px;min-height:16px}.bar b{color:var(--n)}.bar button{margin-left:auto;background:var(--n);color:#fff;border-radius:10px;padding:3px 10px}
+.tw{flex:1!important;min-height:0;overflow:auto;margin-bottom:8px;scroll-snap-type:x proximity;scroll-padding-left:112px}
+table{border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums}
+td,th{height:30px;padding:0;text-align:center;font-size:12px;font-weight:700;min-width:42px;max-width:42px;background:#fff}
+td:not(.n),th:not(.n){scroll-snap-align:start}
+th{position:sticky;top:0;z-index:2;background:var(--n);color:rgba(255,255,255,.8);height:30px;font-size:10px;letter-spacing:.3px}th.n{z-index:3}
+td.n,th.n{position:sticky;left:0;z-index:1;min-width:112px;max-width:112px;text-align:left;padding:0 4px 0 12px;font-size:11px;line-height:1.1;font-weight:700}
+td.n div{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+tr.z td{background:var(--zb)}tr td.fav{background:#FFF1C9}tr td.nx{background:#E4F6A6}tr td.fav.nx{background:#D9EE86}th.nx{background:var(--lime);color:var(--n)}
+tr td.e{color:#A5A9B0;font-weight:500}td.n.me{box-shadow:inset 5px 0 0 var(--n)}td.n.me div{font-weight:800}
+tr.dv td{height:20px;background:#EFEBE3;text-align:left;font-size:9.5px;letter-spacing:.6px;color:var(--g);font-weight:800;max-width:none}tr.dv td span{position:sticky;left:12px}
+.badge{display:inline-block;color:#fff;border-radius:6px;padding:1px 5px;font-size:10px;border:1px solid rgba(255,255,255,.45)}
+.msg{padding:16px;color:var(--g);line-height:1.4}.msg button{margin-top:8px;height:36px;border-radius:12px;background:var(--n);color:#fff;font-weight:700;padding:0 14px}
+#mp{height:150px;border-radius:18px;overflow:hidden;margin-bottom:8px;background:#E8E4DA;position:relative;z-index:0}
+.sc{padding:10px 12px 4px;margin-bottom:8px}.sh b{display:block;font-size:13.5px;font-weight:800}.sh span{font-size:11px;color:var(--g)}
+.bus{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:14px;padding:8px 10px;margin-top:7px}
+.bd{color:#fff;border-radius:10px;min-width:46px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12.5px;padding:0 6px}
+.bt{flex:1;min-width:0}.bt b{display:block;font-size:12.5px;font-weight:800}.bt span{font-size:11px;color:var(--g)}.tm{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+details{margin-top:2px}summary{list-style:none;display:flex;justify-content:space-between;align-items:center;height:28px;font-size:11.5px;font-weight:600;color:var(--g);cursor:pointer;padding:0 4px}summary::-webkit-details-marker{display:none}
+summary:after{content:"";width:6px;height:6px;border-right:2px solid var(--g);border-bottom:2px solid var(--g);transform:rotate(45deg);margin-top:-3px}details[open] summary:after{transform:rotate(-135deg);margin-top:3px}
+.st{display:flex;justify-content:space-between;font-size:11.5px;line-height:1.7;padding:0 4px}
+.pin{position:absolute;transform:translate(-50%,-135%);color:#fff;border:2px solid #fff;border-radius:12px;padding:2px 8px;font:800 11px "Plus Jakarta Sans",system-ui,sans-serif;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+nav{flex:none;display:flex;gap:6px;background:#fff;border-top:1px solid var(--bd);padding:6px 12px calc(6px + env(safe-area-inset-bottom)*.5)}
+nav button{flex:1;height:46px;border-radius:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:700;color:#8A8F99}nav button.on{background:var(--n);color:#fff}
+</style></head><body>
+<header id="hd"></header>
+<main id="m"></main>
+<nav><button id="t1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Horarios</button><button id="t2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 1 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></svg>Cerca de mí</button></nav>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="datos.js"></script>
 <script>
-var KEY='luz-bono-v2';
-var DEF={days:{},cfg:{d:42.5,iee:5.11269632,iva:21}};
-function clone(o){return JSON.parse(JSON.stringify(o))}
-function load(){var o=null,s=clone(DEF);try{var r=localStorage.getItem(KEY);if(r)o=JSON.parse(r)}catch(e){}
- if(o){if(o.days&&typeof o.days==='object'){for(var k in o.days){if(Array.isArray(o.days[k])&&o.days[k].length===24)s.days[k]=o.days[k].map(Number)}}
-  if(o.cfg){for(var c in s.cfg){if(typeof o.cfg[c]==='number')s.cfg[c]=o.cfg[c]}}}
- return s}
-function save(){try{var ks=Object.keys(S.days).sort();while(ks.length>60){delete S.days[ks.shift()]}localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function $(id){return document.getElementById(id)}
-function fmt(n){return n.toLocaleString('es-ES',{minimumFractionDigits:4,maximumFractionDigits:4})}
-function fin(p){return p*(1-S.cfg.d/100)*(1+S.cfg.iee/100)*(1+S.cfg.iva/100)}
-function hl(h){var a=('0'+h).slice(-2),b=('0'+((h+1)%24)).slice(-2);return a+'-'+(h===23?'24':b)+'h'}
-function madrid(){try{var f=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Madrid',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hour12:false}).formatToParts(new Date());var g=function(t){return f.filter(function(x){return x.type===t})[0].value};return{date:g('year')+'-'+g('month')+'-'+g('day'),h:(+g('hour'))%24}}catch(e){var d=new Date();return{date:d.toISOString().slice(0,10),h:d.getHours()}}}
-function ddmmyyyy(s){var p=s.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:s}
-var S=load(),SEL=madrid().date;
-function setMsg(t,ok){var e=$('st');e.textContent=t;e.style.color=ok?'var(--good)':'var(--bad)'}
-function render(){
- var P=S.days[SEL],m=madrid(),isToday=m.date===SEL,ae=document.activeElement;
- [['dt',SEL],['cd',S.cfg.d],['ci',S.cfg.iee],['cv',S.cfg.iva]].forEach(function(x){if(ae!==$(x[0]))$(x[0]).value=x[1]});
- if(!P){
-  $('cards').innerHTML='';$('note').textContent='';
-  $('tbl').innerHTML='<div class="r" style="display:block;padding:16px 14px;min-height:0">No tengo los precios del '+ddmmyyyy(SEL)+'. Pulsa Actualizar para consultarlos.</div>';
-  return}
- var sorted=P.slice().sort(function(a,b){return a-b});
- var lo=sorted[7],hi=sorted[16],mn=P.indexOf(sorted[0]),mx=P.indexOf(sorted[23]);
- var avg=P.reduce(function(a,b){return a+b},0)/24;
- var first=isToday?{t:'Ahora<br>'+hl(m.h),p:P[m.h]}:{t:'Media<br>del día',p:avg};
- function kc(p){return p<=lo?'cg':(p>=hi?'cr':'cm')}
- function card(t,p,k,sel){return '<div class="c k '+k+(sel?' sel':'')+'"><small>'+t+'</small><b>'+fmt(fin(p))+'</b><i>'+fmt(p)+' sin bono</i></div>'}
- $('cards').innerHTML=card(first.t,first.p,kc(first.p),isToday)+card('Más barata<br>'+hl(mn),P[mn],'cg',isToday&&m.h===mn)+card('Más cara<br>'+hl(mx),P[mx],'cr',isToday&&m.h===mx);
- var h='<div class="r h"><span>Hora</span><span>Precio luz<br>€/kWh</span><span>Con bono + impuestos<br>€/kWh</span></div>';
- for(var i=0;i<24;i++){var p=P[i],c=p<=lo?'tg':(p>=hi?'tb':'tm');
-  h+='<div class="r'+(isToday&&i===m.h?' now':'')+'"><span class="hr">'+hl(i)+'</span><span class="t '+c+'">'+fmt(p)+'</span><span class="t fin '+c+'">'+fmt(fin(p))+'</span></div>'}
- $('tbl').innerHTML=h;
- $('note').textContent='Cálculo: precio × (1 − bono) × (1 + imp. eléctrico) × (1 + IVA). Estimación solo del término de energía: el bono aplica hasta un límite anual de kWh y no incluye potencia ni alquiler de contador. Colores de los precios: verde, el tercio más barato del día; amarillo, intermedio; rojo, el tercio más caro.';
-}
-function fetchDay(date){
- var url='https://apidatos.ree.es/es/datos/mercados/precios-mercados-tiempo-real?start_date='+date+'T00:00&end_date='+date+'T23:59&time_trunc=hour';
- return fetch(url,{headers:{Accept:'application/json'}}).then(function(r){if(!r.ok)throw new Error('error '+r.status);return r.json()}).then(function(j){
-  var inc=(j&&j.included)||[],it=null,i;
-  for(i=0;i<inc.length;i++){var a=inc[i]||{},t=((a.type||'')+' '+((a.attributes||{}).title||'')).toUpperCase();if(t.indexOf('PVPC')>=0){it=a;break}}
-  if(!it)throw new Error('la respuesta no incluye el PVPC');
-  var vals=(it.attributes&&it.attributes.values)||[],sum=[],cnt=[];
-  for(i=0;i<24;i++){sum[i]=0;cnt[i]=0}
-  vals.forEach(function(x){var h=parseInt(String(x.datetime).substr(11,2),10);if(h>=0&&h<24&&typeof x.value==='number'){sum[h]+=x.value;cnt[h]++}});
-  var out=[];
-  for(i=0;i<24;i++){if(!cnt[i])throw new Error('aún no están publicados todos los precios de ese día');out.push(sum[i]/cnt[i]/1000)}
-  return out})}
-var reqId=0;
-function update(){
- var id=++reqId,d=SEL;if(S.days[d]){setMsg('',true);return}setMsg('Consultando Red Eléctrica…',true);
- fetchDay(d).then(function(v){S.days[d]=v;save();if(id!==reqId)return;setMsg('',true);render()})
- .catch(function(e){if(id!==reqId)return;var t=(e&&e.name==='TypeError')?'sin conexión o el servidor no permite la consulta':(e&&e.message)||'error desconocido';setMsg('No he podido actualizar: '+t+'.',false)})}
-function pick(){var v=this.value,el=this;if(v&&v!==SEL){SEL=v;render();update()}if(v){el.blur();setTimeout(function(){el.blur()},50)}}
-$('dt').addEventListener('change',pick);$('dt').addEventListener('input',pick);
-$('hoy').onclick=function(){SEL=madrid().date;render();update()};
-$('man').onclick=function(){var d=new Date(madrid().date+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+1);SEL=d.toISOString().slice(0,10);render();update()};
-var lastToday=madrid().date;
-document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'){var t=madrid().date;if(t!==lastToday){lastToday=t;SEL=t}render();update()}});
-function num(id,k){$(id).oninput=function(){var v=parseFloat(this.value);if(v>=0&&v<100){S.cfg[k]=v;save();render()}}}
-num('cd','d');num('ci','iee');num('cv','iva');
-render();update();
-</script>
-</body>
-</html>
+const $=s=>document.querySelector(s);
+const LINES=["360","389.1","389.2","389.3","389.4"],COL={"360":"#B4491B","389":"#5A6B75","389.1":"#0B5D7A","389.2":"#2F7D32","389.3":"#8A5A00","389.4":"#9B2C5A"},MN={S:"Sant Fost",M:"Mollet"};
+const DT={"360":{L:"Laborables (excepto agosto)",S:"Sábados y laborables de agosto",F:"Domingos y festivos"},"389":{N:"Laborables (excepto julio y agosto)",JA:"Laborables de julio y agosto",LEC:"Laborables lectivos"}};
+let D,ST,HOL,FAV,line="360",dir=0,dirManual=false,day,tab=1,pos=null,acc=0,town=null,townManual=false,gpsMsg="",map=null;
+const pad=n=>String(n).padStart(2,"0"),fmt=m=>pad(Math.floor(m/60))+":"+pad(m%60);
+const ymd=d=>""+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
+const today=()=>{const t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate())};
+const addD=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const nowMin=()=>{const d=new Date();return d.getHours()*60+d.getMinutes()};
+const lab=d=>d.toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short"}),iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const dtl=d=>HOL.has(ymd(d))?"Festivo":["Domingo","Laborable","Laborable","Laborable","Laborable","Laborable","Sábado"][d.getDay()];
+const clock=()=>`<div class="clock"><b id="ck">${fmt(nowMin())}</b><span>${dtl(tab==1?day:today())}</span></div>`;
+const AIM='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>';
+function dist(a,b,c,d){const R=6371000,r=Math.PI/180,x=(d-b)*r*Math.cos((a+c)*r/2),y=(c-a)*r;return Math.hypot(x,y)*R}
+function lect(dt){const k=ymd(dt),w=dt.getDay();return w>0&&w<6&&!HOL.has(k)&&k>=D.curso[0]&&k<=D.curso[1]&&!D.vacas.some(v=>k>=v[0]&&k<=v[1])}
+function dayKey(l,dt){const k=ymd(dt),w=dt.getDay(),h=HOL.has(k),m=dt.getMonth();
+ if(l=="360")return(w==0||h)?"F":(w==6||m==7)?"S":"L";
+ if(k<D.valido389)return"NA";if(w==0||w==6||h)return null;
+ if(l=="389.3"||l=="389.4")return lect(dt)?"LEC":null;return(m==6||m==7)?"JA":"N"}
+const tablesFor=(l,dt)=>{const k=dayKey(l,dt);return k&&k!="NA"?D.tables.filter(t=>t.line==l&&t.day==k):[]};
+const tableFor=(l,dt,dr)=>{const a=tablesFor(l,dt);return a.find(t=>t.dir==dr)||a[0]||null};
+const visCols=(T,dt)=>T.day=="N"?T.c.filter(c=>!c.s||(c.s=="L")==lect(dt)):T.c;
+const ends=T=>{const m=T.r.map(r=>ST[r[0]][2]).filter(x=>x!="O");return[m[0],m[m.length-1]]};
+function centroid(m){const s=Object.values(ST).filter(x=>x[2]==m&&x[0]!=null);return[s.reduce((a,x)=>a+x[0],0)/s.length,s.reduce((a,x)=>a+x[1],0)/s.length]}
+function pickDir(l,dt){const a=tableFor(l,dt,0),b=tableFor(l,dt,1);if(!a||!b||a===b||!town)return dir;return ends(a)[0]==town?0:ends(b)[0]==town?1:dir}
+function nextService(l,from){for(let i=1;i<=30;i++){const x=addD(from,i);if(tableFor(l,x,0))return x}return null}
+function near(T){if(!pos)return null;let b=null;T.r.forEach((r,i)=>{const s=ST[r[0]];if(!s||s[0]==null||r[0]=="4724")return;const d=dist(pos[0],pos[1],s[0],s[1]);if(!b||d<b.d)b={i,d,c:r[0],n:r[1]}});return b}
+function header(){let h="";
+ if(tab==1){const t=today(),tm=addD(t,1),k=ymd(day),T=tableFor(line,day,dir),two=tablesFor(line,day).length>1;
+  const en=d=>{const X=tableFor(line,day,d);return X?ends(X):["",""]},lb=d=>(MN[en(d)[0]]||"")+" → "+(MN[en(d)[1]]||"");
+  const cols=T?visCols(T,day):[],txt=T?DT[line=="360"?"360":"389"][T.day]+(T.day=="N"?(lect(day)?" · lectivo":" · no lectivo"):""):"";
+  h=`<div class="top"><h1>Horarios</h1>${clock()}</div>
+  <div class="card ctl"><label class="fld"><input type="date" id="dp" value="${iso(day)}"></label><button class="btn ${k==ymd(t)?"on":""}" data-d="0">Hoy</button><button class="btn ${k==ymd(tm)?"on":""}" data-d="1">Mañana</button></div>
+  <div class="seg">${LINES.map(l=>`<button class="${l==line?"on":""}" data-l="${l}">${l}</button>`).join("")}</div>`+
+  (T?`<div class="seg">${two?[0,1].map(d=>`<button class="${d==T.dir?"on":""}" data-dir="${d}">${lb(d)}</button>`).join(""):`<button class="on">${en(T.dir)[0]==en(T.dir)[1]?"Circuito escolar en "+MN[en(T.dir)[0]]:lb(T.dir)}</button>`}</div><div class="cnt"><b>${cols.length} salidas</b><span>${txt}</span></div>`:"")}
+ else h=`<div class="top"><h1>Cerca de mí</h1>${clock()}</div>
+  <div class="card ctl"><div class="loc">${AIM}<span>${pos?"Ubicación activa"+(acc?" · ±"+acc+" m":""):esc(gpsMsg||"Buscando tu ubicación…")}</span></div><button class="btn dk" id="gps">${pos?"Actualizar":"Reintentar"}</button></div>
+  <div class="seg"><button data-tw="M" class="${town=="M"?"on":""}">Estoy en Mollet</button><button data-tw="S" class="${town=="S"?"on":""}">Estoy en Sant Fost</button></div>`;
+ $("#hd").innerHTML=h}
+function renderH(){const T=tableFor(line,day,dir),m=$("#m"),k=ymd(day);
+ if(!T){const n=nextService(line,day),why=dayKey(line,day)=="NA"?"Los horarios de la línea 389 son válidos desde el 7/9/2026.":k>D.finDatos?"El calendario de festivos está cargado hasta el 31/12/2027.":`La línea ${line} no circula ${line=="389.3"||line=="389.4"?"en días no lectivos ni festivos":"sábados, domingos ni festivos"}.`;
+  m.innerHTML=`<div class="card msg">${why}${n&&dayKey(line,day)!="NA"?` Próximo servicio: ${lab(n)}.<br><button data-dd="${ymd(n)}">Ver ${lab(n)}</button>`:""}</div>`;return}
+ const cols=visCols(T,day),b=near(T),isT=k==ymd(today());let nx=-1,bt=1e9;
+ if(b&&isT){const need=nowMin()+Math.ceil(b.d/80);cols.forEach((c,j)=>{const t=c.t[b.i];if(t>=need&&t<bt){bt=t;nx=j}})}
+ const mixed=new Set(cols.map(c=>c.l)).size>1;
+ let h=pos?(b?`<div class="bar"><span>● <b>${esc(b.n)}</b> · ${Math.round(b.d)} m · ${Math.max(1,Math.round(b.d/80))} min${isT?(nx>=0?` · <b>sale ${fmt(bt)}</b>`:" · sin más salidas hoy"):""}</span></div>`:""):(gpsMsg?`<div class="bar"><span>${esc(gpsMsg)}</span><button id="gps">Reintentar</button></div>`:"");
+ let pm=null;
+ h+=`<div class="tw card"><table><tr><th class="n">PARADA</th>${cols.map((c,j)=>`<th class="${j==nx?"nx":""}">${mixed?`<span class="badge" style="background:${COL[c.l]||"#555"}">${c.l}</span>`:j+1}</th>`).join("")}</tr>`+
+ T.r.map((r,i)=>{const mn=ST[r[0]][3]||"",dv=mn!=pm?`<tr class="dv"><td colspan="${cols.length+1}"><span>${esc(mn.toUpperCase())}</span></td></tr>`:"";pm=mn;const f=FAV.has(r[0])?"fav":"";
+  return dv+`<tr class="${i%2?"z":""}"><td class="n ${f} ${b&&b.i==i?"me":""}"><div>${esc(r[1])}${r[0]=="4724"?" (a demanda)":""}</div></td>${cols.map((c,j)=>{const v=c.t[i];return`<td class="${j==nx?"nx":""} ${v<0?"e":""} ${f}">${v<0?"—":fmt(v)}</td>`}).join("")}</tr>`}).join("")+`</table></div>`;
+ m.innerHTML=h;focusCols(m)}
+function focusCols(m){if(!m.querySelector)return;const tw=m.querySelector(".tw");if(!tw)return;const c=tw.querySelector("td.nx"),me=tw.querySelector("td.n.me");
+ if(c)tw.scrollLeft=Math.max(0,c.offsetLeft-112-c.offsetWidth);if(me&&(me.offsetTop+me.offsetHeight>tw.scrollTop+tw.clientHeight||me.offsetTop<tw.scrollTop+24))tw.scrollTop=Math.max(0,me.offsetTop-3*30)}
+function options(tw){const other=tw=="S"?"M":"S",t0=today(),best=new Map();
+ for(let k=0;k<=7;k++){const dt=addD(t0,k);
+  for(const l of LINES)for(const T of tablesFor(l,dt))for(const c of visCols(T,dt))for(let i=0;i<T.r.length;i++){const t=c.t[i],s=ST[T.r[i][0]];if(t<0||s[2]!=tw)continue;
+   const dd=dist(pos[0],pos[1],s[0],s[1]),need=k?0:nowMin()+Math.ceil(dd/80);if(t<need)continue;
+   let j=-1;for(let q=i+1;q<T.r.length;q++)if(c.t[q]>=0&&ST[T.r[q][0]][2]==other){j=q;break}if(j<0)continue;
+   const key=T.r[i][1].toLowerCase().replace(/[^a-z0-9]/g,""),o=best.get(key);if(!o||k<o.k||(k==o.k&&t<o.dep))best.set(key,{k,dt,T,c,i,j,dep:t,arr:c.t[j],d:dd,l:c.l})}}
+ const seen=new Set(),out=[];for(const x of[...best.values()].sort((a,b)=>a.d-b.d)){if(seen.has(x.c))continue;seen.add(x.c);out.push(x);if(out.length==4)break}
+ return out.sort((a,b)=>a.k-b.k||a.dep-b.dep||a.d-b.d)}
+function renderN(){const m=$("#m");
+ if(!pos){m.innerHTML=`<div class="card msg">${esc(gpsMsg||"Buscando tu ubicación…")}</div>`;return}
+ const res=options(town),to=town=="S"?"Mollet":"Sant Fost",nm=nowMin();
+ let h=`<div id="mp"></div><div class="cnt"><b>Hacia ${to}</b><span>Distancias aproximadas</span></div>`;
+ if(!res.length)h+=`<div class="card msg">No hay buses hacia ${to} en los próximos 7 días.</div>`;
+ for(const r of res){const w=r.k?lab(r.dt):`en ${r.dep-nm} min`,all=r.T.r.map((x,q)=>({n:x[1],t:r.c.t[q],q})).filter(x=>x.t>=0),s=ST[r.T.r[r.i][0]];
+  h+=`<div class="card sc"><div class="sh"><b>${esc(r.T.r[r.i][1])}</b><span>${s[3]} · ${Math.round(r.d)} m · ${Math.max(1,Math.round(r.d/80))} min a pie</span></div>
+  <div class="bus"><div class="bd" style="background:${COL[r.l]||"#555"}">${r.l}</div><div class="bt"><b>Hacia ${to}</b><span>${w} · llega ${fmt(r.arr)}</span></div><div class="tm">${fmt(r.dep)}</div></div>
+  <details><summary>Paradas del trayecto (${all.length})</summary>${all.map(x=>`<div class="st" style="${x.q<r.i?"opacity:.5;":""}${x.q==r.i||x.q==r.j?"font-weight:700;color:var(--n)":""}"><span>${esc(x.n)}${x.q==r.i?" ← subes aquí":x.q==r.j?" ← llegas a "+to:""}</span><b>${fmt(x.t)}</b></div>`).join("")}</details></div>`}
+ m.innerHTML=h;drawMap(res,nm)}
+function drawMap(res,nm){if(typeof L=="undefined"||!$("#mp"))return;
+ map=L.map("mp");L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map);
+ const pts=[pos];L.circle(pos,{radius:60,weight:0,fillColor:"#1D6FEB",fillOpacity:.18}).addTo(map);L.circleMarker(pos,{radius:8,color:"#fff",weight:3,fillColor:"#1D6FEB",fillOpacity:1}).addTo(map);
+ for(const r of res){const s=ST[r.T.r[r.i][0]],p=[s[0],s[1]];pts.push(p);L.circleMarker(p,{radius:5,color:"#fff",weight:2,fillColor:COL[r.l]||"#555",fillOpacity:1}).addTo(map);
+  L.marker(p,{interactive:false,icon:L.divIcon({className:"",iconSize:[0,0],html:`<div class="pin" style="background:${COL[r.l]||"#555"}">${r.l} · ${r.k?fmt(r.dep):(r.dep-nm)+"'"}</div>`})}).addTo(map)}
+ map.fitBounds(pts,{padding:[34,34],maxZoom:17});setTimeout(()=>map&&map.invalidateSize(),0)}
+function render(){if(map){map.remove();map=null}$("#t1").className=tab==1?"on":"";$("#t2").className=tab==2?"on":"";header();tab==1?renderH():renderN()}
+function locate(){gpsMsg="";if(!navigator.geolocation){gpsMsg="Este navegador no permite usar la ubicación.";return render()}
+ navigator.geolocation.getCurrentPosition(p=>{pos=[p.coords.latitude,p.coords.longitude];acc=Math.round(p.coords.accuracy||0);gpsMsg="";if(!townManual){const a=dist(pos[0],pos[1],...centroid("M")),b=dist(pos[0],pos[1],...centroid("S"));town=a<b?"M":"S"}if(!dirManual)dir=pickDir(line,day);render()},
+  e=>{gpsMsg=e&&e.code==1?"Ubicación bloqueada: actívala en el navegador (candado de la barra de direcciones).":"No se pudo obtener la ubicación.";render()},{enableHighAccuracy:true,timeout:15000,maximumAge:30000})}
+document.addEventListener("click",e=>{const c=e.target.closest("[data-l],[data-d],[data-dd],[data-tw],[data-dir],#gps,#t1,#t2");if(!c)return;
+ if(c.dataset.l){line=c.dataset.l;dirManual=false;dir=pickDir(line,day)}else if(c.dataset.d!=null)day=addD(today(),+c.dataset.d);else if(c.dataset.dd){const s=c.dataset.dd;day=new Date(+s.slice(0,4),+s.slice(4,6)-1,+s.slice(6))}
+ else if(c.dataset.tw){town=c.dataset.tw;townManual=true}else if(c.dataset.dir!=null){dir=+c.dataset.dir;dirManual=true}else if(c.id=="t1")tab=1;else if(c.id=="t2"){tab=2;if(!pos)gpsMsg=""}else if(c.id=="gps")return locate();
+ render()});
+document.addEventListener("change",e=>{if(e.target.id=="dp"&&e.target.value){const[y,m,d]=e.target.value.split("-");day=new Date(+y,m-1,+d);if(!dirManual)dir=pickDir(line,day);render()}});
+function init(){if(!window.DATOS){$("#m").innerHTML='<div class="card msg">No se pudieron cargar los horarios (falta datos.js).</div>';return}
+ D=DATOS;ST=D.stops;HOL=new Set(D.festivos);FAV=new Set(D.fav);day=today();
+ if(!tablesFor(line,day).length)line=LINES.find(l=>tablesFor(l,day).length)||line;render();locate();
+ const iv=setInterval(()=>{const e=document.getElementById("ck");if(e)e.textContent=fmt(nowMin())},20000);iv.unref&&iv.unref()}
+if(document.getElementById("m"))init();
+if(/debug/.test(location.search)){const d=document.createElement("div"),pr=document.createElement("div");d.style.cssText="position:fixed;top:0;left:0;right:0;z-index:99;background:#ffd;color:#000;font:11px monospace;padding:2px 4px;white-space:pre-wrap";
+ pr.style.cssText="position:fixed;visibility:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)";document.body.append(d,pr);
+ const u=()=>{const s=getComputedStyle(pr);d.textContent=`inner ${innerWidth}x${innerHeight} vv ${window.visualViewport?Math.round(visualViewport.height):"-"} screen ${screen.width}x${screen.height} standalone ${navigator.standalone} safe top ${s.paddingTop} bottom ${s.paddingBottom} body ${Math.round(document.body.getBoundingClientRect().height)}`};u();addEventListener("resize",u);setInterval(u,2000)}
+</script></body></html>

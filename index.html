@@ -72,7 +72,8 @@ button#hoy:active,button#man:active{opacity:.8}
 .cards{gap:6px;margin-bottom:8px}
 .c{padding:6px 8px;border-radius:10px}.c small{font-size:11px}.c b{font-size:16px;margin-top:0}.c i{font-size:10px}
 .tbl{border-radius:10px}
-.r{min-height:24px;padding:0 10px;font-size:13px;grid-template-columns:72px 1fr 1fr}
+.r{min-height:24px;padding:0 10px;font-size:13px;grid-template-columns:72px minmax(0,1fr) minmax(0,1fr) 56px}
+.r.h span:nth-child(n){text-align:center}
 .r.h{min-height:32px;font-size:11px}
 .hr{font-size:12.5px;gap:6px}.d{width:8px;height:8px}
 </style>
@@ -124,16 +125,17 @@ function render(){
   return}
  var sorted=P.slice().sort(function(a,b){return a-b});
  var lo=sorted[7],hi=sorted[16],mn=P.indexOf(sorted[0]),mx=P.indexOf(sorted[23]);
+ function sv(p){var t=sorted[23];if(!(t>0))return '–';var v=Math.round((1-p/t)*100);if(!(v>0))v=0;if(v>100)v=100;return String(v)+'%'}
  var avg=P.reduce(function(a,b){return a+b},0)/24;
  var first=isToday?{t:'Ahora<br>'+hl(m.h),p:P[m.h]}:{t:'Media<br>del día',p:avg};
  function kc(p){return p<=lo?'cg':(p>=hi?'cr':'cm')}
  function card(t,p,k,sel){return '<div class="c k '+k+(sel?' sel':'')+'"><small>'+t+'</small><b>'+fmt(fin(p))+'</b><i>'+fmt(p)+' sin bono</i></div>'}
  $('cards').innerHTML=card(first.t,first.p,kc(first.p),isToday)+card('Más barata<br>'+hl(mn),P[mn],'cg',isToday&&m.h===mn)+card('Más cara<br>'+hl(mx),P[mx],'cr',isToday&&m.h===mx);
- var h='<div class="r h"><span>Hora</span><span>Precio luz<br>€/kWh</span><span>Con bono + impuestos<br>€/kWh</span></div>';
+ var h='<div class="r h"><span>Hora</span><span>Precio luz<br>€/kWh</span><span>Con bono<br>+ impuestos</span><span>Ahorro<br>%</span></div>';
  for(var i=0;i<24;i++){var p=P[i],c=p<=lo?'tg':(p>=hi?'tb':'tm');
-  h+='<div class="r'+(isToday&&i===m.h?' now':'')+'"><span class="hr">'+hl(i)+'</span><span class="t '+c+'">'+fmt(p)+'</span><span class="t fin '+c+'">'+fmt(fin(p))+'</span></div>'}
+  h+='<div class="r'+(isToday&&i===m.h?' now':'')+'"><span class="hr">'+hl(i)+'</span><span class="t '+c+'">'+fmt(p)+'</span><span class="t fin '+c+'">'+fmt(fin(p))+'</span><span class="t '+c+'">'+(i===mx?'':sv(p))+'</span></div>'}
  $('tbl').innerHTML=h;
- $('note').textContent='Cálculo: precio × (1 − bono) × (1 + imp. eléctrico) × (1 + IVA). Estimación solo del término de energía: el bono aplica hasta un límite anual de kWh y no incluye potencia ni alquiler de contador. Colores de los precios: verde, el tercio más barato del día; amarillo, intermedio; rojo, el tercio más caro.';
+ $('note').textContent='Cálculo: precio × (1 − bono) × (1 + imp. eléctrico) × (1 + IVA). Estimación solo del término de energía: el bono aplica hasta un límite anual de kWh y no incluye potencia ni alquiler de contador. Ahorro: porcentaje que cuesta menos esa hora respecto a la hora más cara del día. Colores de los precios: verde, el tercio más barato del día; amarillo, intermedio; rojo, el tercio más caro.';
 }
 function fetchDay(date){
  var url='https://apidatos.ree.es/es/datos/mercados/precios-mercados-tiempo-real?start_date='+date+'T00:00&end_date='+date+'T23:59&time_trunc=hour';
